@@ -34,6 +34,8 @@ export class OffscreenWorker extends EventEmitter {
      */
     initFakeWorker(link) {
         this.ready = false
+        this.once('ready', () => {
+        })
         this.on('post', (data, opt) => {
             if (!this.ready) this.once('ready', () => this.emit('post', data, opt))
             else this.emit('message', data, opt)
@@ -55,7 +57,7 @@ export class OffscreenWorker extends EventEmitter {
     initWorker(link) {
         const worker = new Worker(link)
         worker.addEventListener('message', ({ data }) => this.emit('message', data))
-        this.on('post', (data, opt) => worker.postMessage(data, opt))
+        this.on('post', ({ data }, opt) => worker.postMessage(data, opt))
     }
 
     /**
@@ -72,7 +74,7 @@ export class OffscreenWorker extends EventEmitter {
      * @param {object} [opt] 
      */
     postMessage(data, opt) {
-        this.emit('post', data, opt)
+        this.emit('post', { data }, opt)
     }
 
 }
